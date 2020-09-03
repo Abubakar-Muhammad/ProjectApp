@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">ProjectApp</string>
+    <string name="title_activity_submission">SubmissionActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="project_submission_text">Project Submission</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="submit_button_text">Submit</string>
+    <string name="email_address">Email Address</string>
+    <string name="github_link">Project on GITHUB (link)</string>
+    <string name="title_activity_leaderboards">LeaderboardsActivity</string>
+    <string name="tab_text_1">Learning Leaders</string>
+    <string name="tab_text_2">Skill IQ Leaders</string>
+    <string name="leaderboard_header">LEADERBOARD</string>
+    <string name="confirmation_text">Are you sure ?</string>
+    <string name="confirmation_button_text">Yes</string>
+    <string name="successful_submission_text">Submission Successful</string>
+    <string name="unsuccessful_submission_text">Submission not Successful</string>
+</resources>

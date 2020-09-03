@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#323133</color>
+    <color name="colorPrimaryDark">#131313</color>
+    <color name="colorAccent">#ECF0F1</color>
+    <color name="hintTextColor">#85817C</color>
+    <color name="textHeaderColor">#E17516</color>
+    <color name="recyclerViewBackground">#FFEBEE</color>
+    <color name="textViewSubmissionBackgroundColor">#FFFF</color>
+
+</resources>
