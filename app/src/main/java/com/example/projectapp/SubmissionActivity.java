@@ -1,21 +1,7 @@
 package com.example.projectapp;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -26,17 +12,23 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.android.volley.VolleyLog;
+
+import java.io.IOException;
+
+import okhttp3.HttpUrl;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class SubmissionActivity extends AppCompatActivity {
 
     public static final String BASE_URL = "https://docs.google.com/forms/d/e/";
-    String FORM_URL = "- 1FAIpQLSf9d1TcNU6zc6KR8bSEM41Z1g1zl35cwZr2xyjIhaMAz8WChQ/formResponse" ;
-    String FIRSTNAME_ENTRY = "entry.1877115667";
-    String LASTNAME_ENTRY = "entry.2006916086";
-    String EMAIL_ENTRY = " entry.1824927963";
-    String GITHUB_ENTRY = "entry.284483984";
     private Button mButton;
     private static final String TAG = "SubmissionActivity";
     private TextView mFirstName;
@@ -104,11 +96,33 @@ public class SubmissionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                final RequestQueue requestQueue = Volley.newRequestQueue(SubmissionActivity.this);
-                StringRequest request = new StringRequest(Request.Method.POST, BASE_URL+FORM_URL, new Response.Listener<String>() {
+                HttpUrl httpUrl = HttpUrl.parse(BASE_URL);
+//                URL url = Uri.parse(BASE_URL);
+                Retrofit retrofit = new Retrofit.Builder().baseUrl(httpUrl)
+//                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                SubmissionService submissionService = retrofit.create(SubmissionService.class);
+                Call<Void> call = submissionService.submit(firstName, lastName, email, github);
+                AsyncTask<Call<Void>,Void,Response<Void>> task = new AsyncTask<Call<Void>, Void, Response<Void>>() {
                     @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG,"onResponse : response "+response);
+                    protected Response<Void> doInBackground(Call<Void>... calls) {
+                        Call<Void> call = calls[0];
+                        Response<Void> response = null;
+                        try {
+                            response = call.execute();
+                        } catch (IOException e) {
+                            Log.d(TAG,"catch block : error "+ e.getMessage());
+                            e.printStackTrace();
+                        }
+                        return response;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Response<Void> voidResponse) {
+                        super.onPostExecute(voidResponse);
+                        Response<Void> response = voidResponse;
+                    if(response.isSuccessful()){
+                        Log.d(TAG,"onResponse : response "+response.toString());
 
                         AlertDialog.Builder builderDialog = new AlertDialog.Builder(SubmissionActivity.this);
                         ViewGroup viewgroup = findViewById(android.R.id.content);
@@ -117,33 +131,50 @@ public class SubmissionActivity extends AppCompatActivity {
                         final AlertDialog dialog = builderDialog.create();
                         alertDialog.hide();
                         dialog.show();
-
                     }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG,"onFailure : error "+error.getMessage());
+                    else {
+                        Log.d(TAG, "onFailure : error " + response.errorBody()+", "+response.raw().toString());
 
                         AlertDialog.Builder builderDialog = new AlertDialog.Builder(SubmissionActivity.this);
                         ViewGroup viewgroup = findViewById(android.R.id.content);
-                        View dialogview  = LayoutInflater.from(SubmissionActivity.this).inflate(R.layout.unsuccessful_submission_layout,viewgroup,false);
+                        View dialogview = LayoutInflater.from(SubmissionActivity.this).inflate(R.layout.unsuccessful_submission_layout, viewgroup, false);
                         builderDialog.setView(dialogview);
                         final AlertDialog dialog = builderDialog.create();
                         alertDialog.hide();
                         dialog.show();
                     }
+                    }
+                };
+                task.execute(call);
+
+                /*final RequestQueue requestQueue = Volley.newRequestQueue(SubmissionActivity.this);
+                StringRequest request = new StringRequest(Request.Method.POST, BASE_URL+FORM_URL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
                 }){
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
+                        String track = " ";
                         Map<String, String>  params = new HashMap<String, String>();
                         params.put(EMAIL_ENTRY, email);
                         params.put(FIRSTNAME_ENTRY, firstName);
                         params.put(LASTNAME_ENTRY, lastName);
+                        params.put(TRACK_ENTRY,track);
                         params.put(GITHUB_ENTRY, github);
                         return params;
                     }
                 };
-                requestQueue.add(request);
+//                request.setShouldCache(false);
+//                request.setRetryPolicy(new DefaultRetryPolicy(10000, 1, 1.0f));
+                requestQueue.add(request);*/
 
 //                Toast.makeText(SubmissionActivity.this,"You clicked yes",Toast.LENGTH_LONG).show();
             }
